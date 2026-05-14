@@ -8,6 +8,7 @@ from app.core.security import get_current_user
 from app.core.limiter import limiter
 from fastapi import Request
 from app.core.logger import logger
+from app.services.email_service import verify_email_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -41,3 +42,12 @@ def refresh(data : RefreshTokenRequest, db: Session = Depends(get_db)):
 @router.post("/me")
 def me(current_user = Depends(get_current_user)):
     return current_user
+
+@router.get("/verify-email")
+def verify_email(token: str,db: Session = Depends(get_db)):
+    try:
+        email = verify_email_user(token, db)
+        return { "email": email, "created" : "successfully. Please verify your email"}
+    except ValueError as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail=str(e))

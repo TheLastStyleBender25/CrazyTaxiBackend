@@ -3,13 +3,21 @@ from app.core.logger import logger
 from app.models import User, Player, RefreshToken, OwnedTaxi, AvailableTaxi, player
 from app.core.security import hash_password, verify_password
 from app.core.security import create_token, create_refresh_token, decode_token
+import uuid
+from datetime import datetime, timedelta
+from app.services.email_service import send_verification_email, verify_email_user
 
 def register_user(db: Session, email : str, password : str):
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         logger.error("User already exists")
         raise ValueError("Email already exists")
-    user = User(email = email, password_hash = hash_password(password))
+    verification_token = str(uuid.uuid4())
+    verification_expiry = (datetime.now() + timedelta(minutes=15))
+    user = User(email = email, password_hash = hash_password(password), is_verified=False, verification_token =verification_token, verification_expiry=verification_expiry)
+    verification_url = (f"https://api.frostbite.co.in/"f"verify-email?token={verification_token}")
+    send_verification_email(email, verification_url)
+
     db.add(user)
     db.flush()
 
@@ -98,3 +106,4 @@ def rotate_refresh_token(db: Session, token: str):
     db.commit()
 
     return {"access_token": new_access_token, "refresh_token": new_refresh_token}
+
