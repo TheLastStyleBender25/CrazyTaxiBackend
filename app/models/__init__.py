@@ -7,3 +7,4 @@ from .transaction import Transaction
 from .ride_milestone import RideMilestone
 from .player_claimed_milestone import PlayerClaimedMilestone
 from .city_level import CityLevel
+from .org_user import OrgUser
