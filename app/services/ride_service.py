@@ -107,7 +107,7 @@ def accept_ride(db, current_user, taxi_id, ride_id):
 
     try:
         redis_cl.setex(f"ride_pool:{current_user.id}", 600, json.dumps(updated_pool))
-        redis_cl.setex(f"active_rides:{current_user.id}", 600, json.dumps(active_rides))
+        redis_cl.setex(f"active_rides:{current_user.id}", 1800, json.dumps(active_rides))
     except Exception as e:
         logger.error(f"redis failed {str(e)}")
 
@@ -123,10 +123,17 @@ def complete_rides(db, current_user, completed_rides):
         ride_completed = False
         for completed_ride in completed_rides:
             if (completed_ride.get("ride_id") == active.get("ride_id") and completed_ride.get("taxi_id") == active.get("taxi_id")):
-                reward = active.get("reward")
+                reward = completed_ride.get("reward", 0)
                 total_reward += reward
                 ride_completed = True
-                completed.append(active)
+                active["reward"] = reward
+                completed.append({
+                    "ride_id": active.get("ride_id"),
+                    "pickup_point": active.get("pickup_point"),
+                    "drop_point": active.get("drop_point"),
+                    "reward": reward,
+                    "taxi_id": active.get("taxi_id")
+                })
                 break
         if not ride_completed:
             remaining_active_rides.append(active)
@@ -135,7 +142,7 @@ def complete_rides(db, current_user, completed_rides):
     player.total_rides_completed += len(completed)
     db.commit()
     try:
-        redis_cl.setex(f"active_rides:{current_user.id}", 600, json.dumps(remaining_active_rides))
+        redis_cl.setex(f"active_rides:{current_user.id}", 1800, json.dumps(remaining_active_rides))
     except Exception as e:
         logger.error(f"redis failed {str(e)}")
 

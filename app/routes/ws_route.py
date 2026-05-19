@@ -6,6 +6,9 @@ from app.websocket.connection_manager import manager
 from app.db.session import SessionLocal
 from app.models import User
 from app.services.ride_service import generate_ride_pool, get_ride_pool, accept_ride, complete_rides
+import asyncio
+
+
 
 router = APIRouter(prefix="/ws", tags=["Websocket"])
 
@@ -14,6 +17,8 @@ async def websocket_endpoint(websocket: WebSocket, player_id: str):
     db = SessionLocal()
     current = db.query(User).filter(User.id == player_id).first()
     await manager.connect(player_id, websocket)
+    await asyncio.sleep(3)
+
     rides = get_ride_pool(current)
     if not rides:
         rides = generate_ride_pool(db, current)
