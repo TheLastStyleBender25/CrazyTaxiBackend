@@ -22,7 +22,7 @@ def buy_taxi(db: Session, current_user, taxi_id):
     db.add(owned_taxi_player)
     db.commit()
 
-    return {"Taxi purchased successfully":taxi.id}
+    return {"detail" : "purcahsed" }
 
 def get_available_all_taxis(db):
     owned_taxi_players = db.query(AvailableTaxi).all()

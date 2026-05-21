@@ -19,3 +19,13 @@ def unlock_next_city(db, player):
         "current_city_unlocked": player.current_city_unlocked,
         "remaining_gems": player.gems
     }
+
+
+
+def get_city_level_all(db):
+    cities = db.query(CityLevel).filter(CityLevel.level > 0).all()
+    if not cities:
+        logger.error(f"no cities found")
+        raise ValueError("No cities found")
+
+    return cities

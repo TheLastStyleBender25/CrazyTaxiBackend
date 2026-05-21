@@ -39,7 +39,7 @@ def get_claimable_milestones(db, player):
     milestones = db.query(RideMilestone).all()
     claimable = []
     for milestone in milestones:
-        if (player.total_rides_completed >= milestone.required_rides and milestone.id not in claimed_ids):
+        if (milestone.id not in claimed_ids):
             claimable.append({ "id": milestone.id, "required_rides": milestone.required_rides, "gem_reward": milestone.gem_reward})
 
-    return claimable
+    return {"claimable": claimable, "milestones": milestones}

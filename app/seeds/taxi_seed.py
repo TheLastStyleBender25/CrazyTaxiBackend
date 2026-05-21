@@ -313,24 +313,6 @@ def seed_taxis():
             id=12,
             level=12,
             gems_required=2800
-        ),
-
-        CityLevel(
-            id=13,
-            level=13,
-            gems_required=3600
-        ),
-
-        CityLevel(
-            id=14,
-            level=14,
-            gems_required=4500
-        ),
-
-        CityLevel(
-            id=15,
-            level=15,
-            gems_required=5500
         )
     ]
 
